@@ -313,6 +313,9 @@ h2 {
     flex-direction: column;
   }
 
+  .movements {
+    max-height: 50vh;
+  }
   .app {
     display: flex;
     flex-direction: column;
