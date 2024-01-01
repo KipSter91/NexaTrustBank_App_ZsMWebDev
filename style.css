@@ -32,7 +32,7 @@ nav {
 .logo {
   height: 5.25rem;
   border-radius: 25px;
-  box-shadow: -0.5em 0 .4em #f5465d;
+  box-shadow: -0.5em 0 0.4em #f5465d;
 }
 
 .login {
@@ -124,9 +124,9 @@ nav {
   background-color: #fff;
   border-radius: 1rem;
   overflow: scroll;
-  box-shadow: -0.5em 0 .4em #f5465d;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  box-shadow: -0.5em 0 0.4em #f5465d;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .movements::-webkit-scrollbar {
@@ -217,7 +217,7 @@ nav {
   border-radius: 1rem;
   padding: 3rem 4rem;
   color: #fff;
-  box-shadow: -0.5em 0 .4em #f5465d;
+  box-shadow: -0.5em 0 0.4em #f5465d;
 }
 
 .operation--transfer {
@@ -301,4 +301,35 @@ h2 {
 
 .timer {
   font-weight: 600;
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 2rem;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+  }
+  .welcome {
+    font-size: 1.5rem;
+    padding: 1rem;
+  }
+
+  .login {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .login__input {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
 }
