@@ -335,4 +335,12 @@ h2 {
     width: 100%;
     margin: 0.5rem 0;
   }
+
+  .operation {
+    text-align: center;
+  
+  }
+  .btn--sort {
+    display: none;
+  }
 }
