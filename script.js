@@ -53,7 +53,7 @@ const displayMovements = (movements) => {
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
       <!-- <div class="movements__date">3 days ago</div> -->
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov}€</div>
     </div>`
 
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
@@ -62,8 +62,11 @@ const displayMovements = (movements) => {
 
 displayMovements(account1.movements);
 
-const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''))
-
-createUserName(accounts)
-
+const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
+createUserName(accounts);
 console.log(accounts);
+
+const displayBalance = (movements) => {
+  labelBalance.textContent = `${movements.reduce((acc, cur) => acc + cur, 0)}€`
+}
+displayBalance(account1.movements)
