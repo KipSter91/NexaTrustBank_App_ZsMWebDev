@@ -12,7 +12,7 @@ const account1 = {
 
 const account2 = {
   owner: 'Barbara Marku',
-  movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
+  movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30, 25000],
   interestRate: 1.5,
   pin: 2222,
 };
@@ -45,8 +45,14 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = (movements) => {
+//cumpute usernames
+const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
+createUserName(accounts);
 
+console.log(accounts);
+
+//display elements from the data of the account
+const displayMovements = (movements) => {
   movements.forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
@@ -55,20 +61,16 @@ const displayMovements = (movements) => {
       <!-- <div class="movements__date">3 days ago</div> -->
       <div class="movements__value">${mov}€</div>
     </div>`
-
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
 };
-displayMovements(account1.movements);
-
 
 const displayBalance = (movements) => {
   labelBalance.textContent = `${movements.reduce((acc, cur) => acc + cur, 0)}€`
 }
-displayBalance(account1.movements);
 
-const displaySummary = (movements) => {
-  const { sumIn, sumOut } = movements.reduce((acc, cur) => {
+const displaySummary = (acc) => {
+  const { sumIn, sumOut } = acc.movements.reduce((acc, cur) => {
     if (cur > 0) {
       acc.sumIn += cur;
     } else if (cur < 0) {
@@ -79,17 +81,44 @@ const displaySummary = (movements) => {
 
   labelSumIn.textContent = `${sumIn}€`;
   labelSumOut.textContent = `${sumOut}€`;
-  labelSumInterest.textContent = `${movements
+  labelSumInterest.textContent = `${acc.movements
     .filter(mov => mov > 0)
-    .map(deposit => deposit * account1.interestRate / 100)
+    .map(deposit => deposit * acc.interestRate / 100)
     .filter(interest => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0)
     }€`
 };
-displaySummary(account1.movements);
 
-const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
-createUserName(accounts);
-console.log(accounts);
 
-console.log(account1.move);
+//Event Handlers
+
+// Function to find an account based on username and PIN
+const findAccount = (username, pin) => accounts.find(acc => acc.username === username && acc.pin === Number(pin));
+
+// Event listener for the login button
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const inputUsername = inputLoginUsername.value;
+  const inputPin = Number(inputLoginPin.value);
+
+  // Find the account
+  const currentAccount = findAccount(inputUsername, inputPin);
+
+  if (currentAccount) {
+    // Display account information and update the UI
+    displayMovements(currentAccount.movements);
+    displayBalance(currentAccount.movements);
+    displaySummary(currentAccount);
+    containerApp.classList.add('addopacity');
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ').at(0)}`;
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+  } else {
+    // Handle invalid login
+    labelWelcome.textContent = 'Invalid username or PIN, please try to login again!';
+    inputLoginUsername.value = inputLoginPin.value = '';
+    containerApp.classList.remove('addopacity');
+  }
+});

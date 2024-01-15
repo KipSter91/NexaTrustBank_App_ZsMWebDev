@@ -90,8 +90,13 @@ nav {
   gap: 2rem;
 
   /* This creates the fade in/out animation */
-  /* opacity: 0; */
+  opacity: 0;
   transition: all 1s;
+}
+
+/*to display the app*/
+.addopacity {
+  opacity: 100;
 }
 
 .balance {
@@ -338,7 +343,6 @@ h2 {
 
   .operation {
     text-align: center;
-  
   }
   .btn--sort {
     display: none;
