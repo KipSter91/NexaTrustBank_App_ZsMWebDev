@@ -59,14 +59,37 @@ const displayMovements = (movements) => {
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
 };
-
 displayMovements(account1.movements);
+
+
+const displayBalance = (movements) => {
+  labelBalance.textContent = `${movements.reduce((acc, cur) => acc + cur, 0)}€`
+}
+displayBalance(account1.movements);
+
+const displaySummary = (movements) => {
+  const { sumIn, sumOut } = movements.reduce((acc, cur) => {
+    if (cur > 0) {
+      acc.sumIn += cur;
+    } else if (cur < 0) {
+      acc.sumOut += Math.abs(cur);
+    }
+    return acc;
+  }, { sumIn: 0, sumOut: 0 });
+
+  labelSumIn.textContent = `${sumIn}€`;
+  labelSumOut.textContent = `${sumOut}€`;
+  labelSumInterest.textContent = `${movements
+    .filter(mov => mov > 0)
+    .map(deposit => deposit * account1.interestRate / 100)
+    .filter(interest => interest >= 1)
+    .reduce((acc, interest) => acc + interest, 0)
+    }€`
+};
+displaySummary(account1.movements);
 
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
 createUserName(accounts);
 console.log(accounts);
 
-const displayBalance = (movements) => {
-  labelBalance.textContent = `${movements.reduce((acc, cur) => acc + cur, 0)}€`
-}
-displayBalance(account1.movements)
+console.log(account1.move);
