@@ -20,7 +20,9 @@ const account2 = {
 const accounts = [account1, account2];
 
 // Elements
-const ca = 'classList.add';
+const modal = document.getElementById("myModal");
+const modalMessage = document.getElementById("modal-message");
+const closeButton = document.getElementsByClassName("close")[0];
 
 const loginForm = document.querySelector('.login');
 const labelWelcome = document.querySelector('.welcome');
@@ -53,8 +55,6 @@ const inputClosePin = document.querySelector('.form__input--pin');
 //cumpute usernames
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
 createUserName(accounts);
-
-console.log(accounts);
 
 //display elements from the data of the account
 const displayMovements = (movements) => {
@@ -95,23 +95,41 @@ const displaySummary = (acc) => {
     }€`
 };
 
+//MODAL for the error messages
+// Function to open the modal and display a message
+function openModal(message) {
+  modal.style.animation = 'fadeIn 0.5s ease-in-out'
+  modalMessage.textContent = message;
+  modal.style.display = 'block';
+}
+// Function to close the modal with fade-out animation
+function closeModal() {
+  modal.style.animation = 'fadeOut 0.5s ease-in-out'; // Apply fade-out animation
+  setTimeout(() => {
+    modal.style.display = 'none'; // Hide the modal after animation
+  }, 500); // Adjust the delay to match the animation duration
+}
 
-//Event Handlers
+// Event listener to close the modal when clicking the close button
+closeButton.addEventListener('click', () => {
+  closeModal();
+});
 
-// Function to find an account based on username and PIN
-const findAccount = (username, pin) => accounts.find(acc => acc.username === username && acc.pin === Number(pin));
+// Event listener to close the modal when clicking outside the modal content
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+//EVENT HANDLERS
+let currentAccount;
 
 // Event listener for the login button
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
-
-  const inputUsername = inputLoginUsername.value;
-  const inputPin = Number(inputLoginPin.value);
-
-  // Find the account
-  const currentAccount = findAccount(inputUsername, inputPin);
-
-  if (currentAccount) {
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
     // Display account information and update the UI
     displayMovements(currentAccount.movements);
     displayBalance(currentAccount.movements);
@@ -135,13 +153,41 @@ btnLogin.addEventListener('click', function (e) {
   }
 });
 
-//Eventlistener for logout button
+//Event listener for logout button
 btnLogOut.addEventListener('click', () => {
   btnLogOut.classList.add('hidden');
   loginForm.classList.remove('hidden');
   inputLoginUsername.value = inputLoginPin.value = '';
   containerApp.classList.remove('addopacity');
-  labelWelcome.textContent = 'Log in to get started:'
+  labelWelcome.textContent = 'Log in to get started:';
 });
 
-//Transer 
+let transferAccount;
+
+//Transer money
+btnTransfer.addEventListener('click', (e) => {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  transferAccount = accounts.find(acc => acc.username === inputTransferTo.value)
+  if (transferAccount && transferAccount !== currentAccount) {
+    if (transferAccount?.movements && Number(labelBalance.textContent.slice(0, -1)) >= inputTransferAmount.value) {
+      if (inputTransferAmount.value > 0) {
+        transferAccount.movements.push(amount);
+        currentAccount.movements.push(-amount);
+        displayMovements(currentAccount.movements);
+        displayBalance(currentAccount.movements);
+        displaySummary(currentAccount);
+        inputTransferTo.value = inputTransferAmount.value = '';
+      } else {
+        openModal(`Can't transfer a negative amount.`);
+        inputTransferTo.value = inputTransferAmount.value = '';
+      }
+    } else {
+      openModal('Insufficient funds.');
+      inputTransferTo.value = inputTransferAmount.value = '';
+    }
+  } else {
+    openModal('Invalid transfer account');
+    inputTransferTo.value = inputTransferAmount.value = '';
+  };
+});
