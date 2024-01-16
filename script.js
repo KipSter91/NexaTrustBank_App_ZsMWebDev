@@ -20,6 +20,9 @@ const account2 = {
 const accounts = [account1, account2];
 
 // Elements
+const ca = 'classList.add';
+
+const loginForm = document.querySelector('.login');
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
 const labelBalance = document.querySelector('.balance__value');
@@ -28,6 +31,7 @@ const labelSumOut = document.querySelector('.summary__value--out');
 const labelSumInterest = document.querySelector('.summary__value--interest');
 const labelTimer = document.querySelector('.timer');
 
+const containerNav = document.querySelector('.nav');
 const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
@@ -36,6 +40,7 @@ const btnTransfer = document.querySelector('.form__btn--transfer');
 const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
 const btnSort = document.querySelector('.btn--sort');
+const btnLogOut = document.createElement('button');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
@@ -53,6 +58,7 @@ console.log(accounts);
 
 //display elements from the data of the account
 const displayMovements = (movements) => {
+  containerMovements.innerHTML = '';
   movements.forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
@@ -110,15 +116,32 @@ btnLogin.addEventListener('click', function (e) {
     displayMovements(currentAccount.movements);
     displayBalance(currentAccount.movements);
     displaySummary(currentAccount);
+    btnLogOut.classList.remove('hidden');
     containerApp.classList.add('addopacity');
     labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ').at(0)}`;
+    loginForm.classList.add('hidden');
+    labelWelcome.classList.add('loggedin');
+    containerNav.appendChild(btnLogOut);
+    btnLogOut.textContent = 'Logout';
+    btnLogOut.classList.add('logout__btn');
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
   } else {
     // Handle invalid login
-    labelWelcome.textContent = 'Invalid username or PIN, please try to login again!';
+    labelWelcome.textContent = 'Invalid login credentials!';
     inputLoginUsername.value = inputLoginPin.value = '';
     containerApp.classList.remove('addopacity');
   }
 });
+
+//Eventlistener for logout button
+btnLogOut.addEventListener('click', () => {
+  btnLogOut.classList.add('hidden');
+  loginForm.classList.remove('hidden');
+  inputLoginUsername.value = inputLoginPin.value = '';
+  containerApp.classList.remove('addopacity');
+  labelWelcome.textContent = 'Log in to get started:'
+});
+
+//Transer 
