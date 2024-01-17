@@ -1,7 +1,6 @@
 'use strict';
 
 // NexaTrust Bank APP
-
 // Data
 const account1 = {
   owner: 'Zsolt Marku',
@@ -19,10 +18,10 @@ const account2 = {
 
 const accounts = [account1, account2];
 
-// Elements
-const modal = document.getElementById("myModal");
-const modalMessage = document.getElementById("modal-message");
-const closeButton = document.getElementsByClassName("close")[0];
+
+// DOM Elements
+const modal = document.querySelector('.modal');
+const modalMessage = document.querySelector('.modal-message');
 
 const loginForm = document.querySelector('.login');
 const labelWelcome = document.querySelector('.welcome');
@@ -33,7 +32,7 @@ const labelSumOut = document.querySelector('.summary__value--out');
 const labelSumInterest = document.querySelector('.summary__value--interest');
 const labelTimer = document.querySelector('.timer');
 
-const containerNav = document.querySelector('.nav');
+const containerNav = document.querySelector('.nav__login');
 const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
@@ -43,6 +42,7 @@ const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
 const btnSort = document.querySelector('.btn--sort');
 const btnLogOut = document.createElement('button');
+const btnCloseModal = document.querySelector('.close__modal');
 
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
@@ -52,14 +52,16 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-//cumpute usernames
+
+//Cumpute usernames
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
 createUserName(accounts);
 
-//display elements from the data of the account
-const displayMovements = (movements) => {
+
+//Display movements
+const displayMovements = (acc) => {
   containerMovements.innerHTML = '';
-  movements.forEach((mov, i) => {
+  acc.movements.forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
     <div class= "movements__row">
@@ -71,10 +73,15 @@ const displayMovements = (movements) => {
   });
 };
 
-const displayBalance = (movements) => {
-  labelBalance.textContent = `${movements.reduce((acc, cur) => acc + cur, 0)}€`
+
+//Display balance
+const displayBalance = (acc) => {
+  acc.balance = acc.movements.reduce((acc, cur) => acc + cur, 0)
+  labelBalance.textContent = `${acc.balance}€`
 }
 
+
+//Display summary
 const displaySummary = (acc) => {
   const { sumIn, sumOut } = acc.movements.reduce((acc, cur) => {
     if (cur > 0) {
@@ -95,25 +102,71 @@ const displaySummary = (acc) => {
     }€`
 };
 
-//MODAL for the error messages
-// Function to open the modal and display a message
-function openModal(message) {
-  modal.style.animation = 'fadeIn 0.5s ease-in-out'
+
+//Login UI
+const LoginUI = () => {
+  document.body.style.overflow = 'visible';
+  btnLogOut.classList.remove('hidden');
+  containerApp.classList.add('addopacity');
+  containerNav.classList.remove('nav__login');
+  containerNav.classList.add('nav__loggedin');
+  loginForm.classList.add('hidden');
+  labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ').at(0)}`;
+}
+
+
+//Create and style logout button
+const createLogOutBtn = () => {
+  containerNav.appendChild(btnLogOut);
+  btnLogOut.classList.add('logout__btn');
+  btnLogOut.textContent = 'Logout';
+};
+
+
+//Logout UI
+const logOutUI = () => {
+  document.body.style.overflow = 'hidden';
+  btnLogOut.classList.toggle('hidden');
+  loginForm.classList.toggle('hidden');
+  containerApp.classList.toggle('addopacity');
+  containerNav.classList.toggle('nav__login');
+  containerNav.classList.toggle('nav__loggedin');
+  labelWelcome.textContent = 'Log in to get started:';
+}
+
+
+//Update UI
+const updateUI = (acc) => {
+  displayMovements(acc);
+  displayBalance(acc);
+  displaySummary(acc);
+}
+
+
+//Modal for the error messages
+// Function to open the modal, open the modal with fade-in animation and display a message
+const openModal = (message) => {
+  modal.style.animation = 'fadeIn 0.5s ease-in-out';
   modalMessage.textContent = message;
   modal.style.display = 'block';
 }
+
+
 // Function to close the modal with fade-out animation
-function closeModal() {
-  modal.style.animation = 'fadeOut 0.5s ease-in-out'; // Apply fade-out animation
+const closeModal = () => {
+  modal.style.animation = 'fadeOut 0.5s ease-in-out';
   setTimeout(() => {
     modal.style.display = 'none'; // Hide the modal after animation
   }, 500); // Adjust the delay to match the animation duration
 }
 
+
+//EVENT HANDLERS
 // Event listener to close the modal when clicking the close button
-closeButton.addEventListener('click', () => {
+btnCloseModal.addEventListener('click', () => {
   closeModal();
 });
+
 
 // Event listener to close the modal when clicking outside the modal content
 modal.addEventListener('click', (e) => {
@@ -122,72 +175,73 @@ modal.addEventListener('click', (e) => {
   }
 });
 
-//EVENT HANDLERS
-let currentAccount;
 
+let currentAccount;
 // Event listener for the login button
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
   currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
     // Display account information and update the UI
-    displayMovements(currentAccount.movements);
-    displayBalance(currentAccount.movements);
-    displaySummary(currentAccount);
-    btnLogOut.classList.remove('hidden');
-    containerApp.classList.add('addopacity');
-    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ').at(0)}`;
-    loginForm.classList.add('hidden');
-    labelWelcome.classList.add('loggedin');
-    containerNav.appendChild(btnLogOut);
-    btnLogOut.textContent = 'Logout';
-    btnLogOut.classList.add('logout__btn');
-
+    updateUI(currentAccount);
+    createLogOutBtn();
+    LoginUI();
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
   } else {
     // Handle invalid login
-    labelWelcome.textContent = 'Invalid login credentials!';
+    openModal('Invalid login credentials!');
     inputLoginUsername.value = inputLoginPin.value = '';
     containerApp.classList.remove('addopacity');
   }
 });
 
+
 //Event listener for logout button
 btnLogOut.addEventListener('click', () => {
-  btnLogOut.classList.add('hidden');
-  loginForm.classList.remove('hidden');
+  logOutUI();
   inputLoginUsername.value = inputLoginPin.value = '';
-  containerApp.classList.remove('addopacity');
-  labelWelcome.textContent = 'Log in to get started:';
 });
 
-let transferAccount;
 
 //Transer money
 btnTransfer.addEventListener('click', (e) => {
   e.preventDefault();
   const amount = Number(inputTransferAmount.value);
-  transferAccount = accounts.find(acc => acc.username === inputTransferTo.value)
+  const transferAccount = accounts.find(acc => acc.username === inputTransferTo.value)
   if (transferAccount && transferAccount !== currentAccount) {
-    if (transferAccount?.movements && Number(labelBalance.textContent.slice(0, -1)) >= inputTransferAmount.value) {
+    if (transferAccount?.movements && currentAccount.balance >= inputTransferAmount.value) {
       if (inputTransferAmount.value > 0) {
         transferAccount.movements.push(amount);
         currentAccount.movements.push(-amount);
-        displayMovements(currentAccount.movements);
-        displayBalance(currentAccount.movements);
-        displaySummary(currentAccount);
+        updateUI(currentAccount)
         inputTransferTo.value = inputTransferAmount.value = '';
       } else {
-        openModal(`Can't transfer a negative amount.`);
+        openModal(`Can't transfer a negative amount!`);
         inputTransferTo.value = inputTransferAmount.value = '';
       }
     } else {
-      openModal('Insufficient funds.');
+      openModal('Insufficient balance!');
       inputTransferTo.value = inputTransferAmount.value = '';
     }
   } else {
-    openModal('Invalid transfer account');
+    openModal('Invalid transfer account!');
     inputTransferTo.value = inputTransferAmount.value = '';
   };
 });
+
+
+//Close account
+btnClose.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
+    const indexToRemove = accounts.findIndex(acc => acc === currentAccount);
+    accounts.splice(indexToRemove, 1);
+    logOutUI();
+    openModal(`Your account has been succesfully deleted.`);
+    console.log(accounts);
+  } else {
+    openModal('Invalid user credentials!')
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
+})
