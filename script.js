@@ -61,7 +61,7 @@ createUserName(accounts);
 //Display movements
 const displayMovements = (acc) => {
   containerMovements.innerHTML = '';
-  acc.movements.forEach((mov, i) => {
+  acc.forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
     <div class= "movements__row">
@@ -72,7 +72,6 @@ const displayMovements = (acc) => {
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
 };
-
 
 //Display balance
 const displayBalance = (acc) => {
@@ -137,7 +136,7 @@ const logOutUI = () => {
 
 //Update UI
 const updateUI = (acc) => {
-  displayMovements(acc);
+  displayMovements(acc.movements);
   displayBalance(acc);
   displaySummary(acc);
 }
@@ -259,3 +258,18 @@ btnClose.addEventListener('click', (e) => {
   }
   inputCloseUsername.value = inputClosePin.value = '';
 })
+
+//Sort movements
+// solution with using an array of functions;
+const sortFunctions = [
+  () => currentAccount.movements, // Original order; with original array
+  () => [...currentAccount.movements].sort((a, b) => a - b), // Ascending; with shallow copy
+  () => [...currentAccount.movements].sort((a, b) => b - a), // Descending; with shallow copy
+];
+let currentState = 0;
+
+btnSort.addEventListener('click', (e) => {
+  e.preventDefault();
+  displayMovements(sortFunctions[currentState]());
+  currentState = (currentState + 1) % sortFunctions.length;
+});
