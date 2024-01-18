@@ -79,7 +79,6 @@ const displayBalance = (acc) => {
   labelBalance.textContent = `${acc.balance}€`
 }
 
-
 //Display summary
 const displaySummary = (acc) => {
   const { sumIn, sumOut } = acc.movements.reduce((acc, cur) => {
@@ -202,6 +201,15 @@ btnLogOut.addEventListener('click', () => {
   inputLoginUsername.value = inputLoginPin.value = '';
 });
 
+
+//Getmovements from UI (Array.from function)
+labelBalance.addEventListener('click', () => {
+  const movementsUI = Array.from(document.querySelectorAll('.movements__value'), el => Number(el.textContent.slice(0, -1)))
+  //with forEach method
+  // const movementsUI = [];
+  // getBalance.forEach(el => movementsUI.push(Number(el.textContent.slice(0, -1))));
+  console.log(movementsUI);
+})
 
 //Transer money
 btnTransfer.addEventListener('click', (e) => {
