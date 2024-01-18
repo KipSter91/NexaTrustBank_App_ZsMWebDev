@@ -230,12 +230,26 @@ btnTransfer.addEventListener('click', (e) => {
   };
 });
 
+//Request loan
+btnLoan.addEventListener('click', (e) => {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+    inputLoanAmount.value = '';
+  } else {
+    openModal('Invalid loan request!');
+    inputLoanAmount.value = '';
+  }
+});
 
 //Close account
 btnClose.addEventListener('click', (e) => {
   e.preventDefault();
+  //defensive programming to ensure that the array manipulation is safe
   if (currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
-    const indexToRemove = accounts.findIndex(acc => acc === currentAccount);
+    const indexToRemove = accounts.findIndex(acc => acc.username === currentAccount.username);
     accounts.splice(indexToRemove, 1);
     logOutUI();
     openModal(`Your account has been succesfully deleted.`);
