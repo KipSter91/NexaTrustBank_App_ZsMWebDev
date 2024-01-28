@@ -4,14 +4,14 @@
 // Data
 const account1 = {
   owner: 'Zsolt Marku',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
+  movements: [200, 450, -400.29, 3000, -650.50, -130.99, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
 };
 
 const account2 = {
   owner: 'Barbara Marku',
-  movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30, 25000],
+  movements: [5000, 3400, -150.11, -790, -3210.21, -1000, 8500, -30, 25000],
   interestRate: 1.5,
   pin: 2222,
 };
@@ -67,7 +67,7 @@ const displayMovements = (acc) => {
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
       <!-- <div class="movements__date">3 days ago</div> -->
-      <div class="movements__value">${mov}€</div>
+      <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>`
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
@@ -76,7 +76,7 @@ const displayMovements = (acc) => {
 //Display balance
 const displayBalance = (acc) => {
   acc.balance = acc.movements.reduce((acc, cur) => acc + cur, 0)
-  labelBalance.textContent = `${acc.balance}€`
+  labelBalance.textContent = `${acc.balance.toFixed(2)}€`
 }
 
 //Display summary
@@ -90,13 +90,13 @@ const displaySummary = (acc) => {
     return acc;
   }, { sumIn: 0, sumOut: 0 });
 
-  labelSumIn.textContent = `${sumIn}€`;
-  labelSumOut.textContent = `${sumOut}€`;
+  labelSumIn.textContent = `${sumIn.toFixed(2)}€`;
+  labelSumOut.textContent = `${sumOut.toFixed(2)}€`;
   labelSumInterest.textContent = `${acc.movements
     .filter(mov => mov > 0)
     .map(deposit => deposit * acc.interestRate / 100)
     .filter(interest => interest >= 1)
-    .reduce((acc, interest) => acc + interest, 0)
+    .reduce((acc, interest) => acc + interest, 0).toFixed(2)
     }€`
 };
 
@@ -179,7 +179,7 @@ let currentAccount;
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
   currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +inputLoginPin.value) {
     // Display account information and update the UI
     updateUI(currentAccount);
     createLogOutBtn();
@@ -204,7 +204,7 @@ btnLogOut.addEventListener('click', () => {
 
 //Getmovements from UI (Array.from function)
 labelBalance.addEventListener('click', () => {
-  const movementsUI = Array.from(document.querySelectorAll('.movements__value'), el => Number(el.textContent.slice(0, -1)))
+  const movementsUI = Array.from(document.querySelectorAll('.movements__value'), el => +el.textContent.slice(0, -1))
   //with forEach method
   // const movementsUI = [];
   // getBalance.forEach(el => movementsUI.push(Number(el.textContent.slice(0, -1))));
@@ -214,7 +214,7 @@ labelBalance.addEventListener('click', () => {
 //Transer money
 btnTransfer.addEventListener('click', (e) => {
   e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const transferAccount = accounts.find(acc => acc.username === inputTransferTo.value)
   if (transferAccount && transferAccount !== currentAccount) {
     if (transferAccount?.movements && currentAccount.balance >= inputTransferAmount.value) {
@@ -240,7 +240,7 @@ btnTransfer.addEventListener('click', (e) => {
 //Request loan
 btnLoan.addEventListener('click', (e) => {
   e.preventDefault();
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     currentAccount.movements.push(amount);
     updateUI(currentAccount);
@@ -255,7 +255,7 @@ btnLoan.addEventListener('click', (e) => {
 btnClose.addEventListener('click', (e) => {
   e.preventDefault();
   //defensive programming to ensure that the array manipulation is safe
-  if (currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
+  if (currentAccount.username === inputCloseUsername.value && currentAccount.pin === +inputClosePin.value) {
     const indexToRemove = accounts.findIndex(acc => acc.username === currentAccount.username);
     accounts.splice(indexToRemove, 1);
     logOutUI();
