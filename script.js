@@ -7,13 +7,37 @@ const account1 = {
   movements: [200, 450, -400.29, 3000, -650.50, -130.99, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  movementsDates: [
+    "2023-11-18T21:31:17.178Z",
+    "2023-12-23T07:42:02.383Z",
+    "2024-01-20T09:15:04.904Z",
+    "2024-01-21T10:17:24.185Z",
+    "2024-01-22T14:11:59.604Z",
+    "2024-01-24T17:01:17.194Z",
+    "2024-01-24T23:36:17.929Z",
+    "2024-01-26T10:51:36.790Z",
+  ],
+  currency: "EUR",
+  locale: "nl-NL"
 };
 
 const account2 = {
   owner: 'Barbara Marku',
-  movements: [5000, 3400, -150.11, -790, -3210.21, -1000, 8500, -30, 25000],
+  movements: [5000, 3400, -150.11, -790, -3210.21, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  movementsDates: [
+    "2023-11-18T13:15:33.035Z",
+    "2023-12-23T09:48:16.867Z",
+    "2024-01-20T06:04:23.907Z",
+    "2024-01-21T14:18:46.235Z",
+    "2024-01-22T16:33:06.386Z",
+    "2024-01-24T14:43:26.374Z",
+    "2024-01-24T18:49:59.371Z",
+    "2024-01-26T12:01:20.894Z",
+  ],
+  currency: "EUR",
+  locale: "nl-NL"
 };
 
 const accounts = [account1, account2];
@@ -58,15 +82,40 @@ const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLo
 createUserName(accounts);
 
 
+//Display dates
+const currentDate = new Date(Date.now());
+console.log(currentDate.toLocaleString().split(','));
+
+//Display formatted date
+labelDate.textContent = currentDate
+  .toLocaleDateString()
+  .split('/')
+  .map(number => number.padStart(2, 0))
+  .join('/')
+
+//Display greetings text based on the current time of day
+const welcomeText = () => {
+  const currentHour = currentDate.getHours();
+  const text = ['Good morning', 'Good afternoon', 'Good evening']
+  if (currentHour >= 3 && currentHour < 12) {
+    return text[0];
+  } if (currentHour >= 12 && currentHour < 18) {
+    return text[1];
+  } else {
+    return text[2];
+  }
+}
+
+
 //Display movements
 const displayMovements = (acc) => {
   containerMovements.innerHTML = '';
-  acc.forEach((mov, i) => {
+  acc.movements.forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
-      <!-- <div class="movements__date">3 days ago</div> -->
+      <div class="movements__date">${new Date(acc.movementsDates[i]).toDateString()}</div>
       <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>`
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
@@ -109,7 +158,7 @@ const LoginUI = () => {
   containerNav.classList.remove('nav__login');
   containerNav.classList.add('nav__loggedin');
   loginForm.classList.add('hidden');
-  labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ').at(0)}`;
+  labelWelcome.textContent = `${welcomeText()}, ${currentAccount.owner.split(' ').at(0)}`;
 }
 
 
@@ -135,7 +184,7 @@ const logOutUI = () => {
 
 //Update UI
 const updateUI = (acc) => {
-  displayMovements(acc.movements);
+  displayMovements(acc);
   displayBalance(acc);
   displaySummary(acc);
 }
@@ -220,7 +269,9 @@ btnTransfer.addEventListener('click', (e) => {
     if (transferAccount?.movements && currentAccount.balance >= inputTransferAmount.value) {
       if (inputTransferAmount.value > 0) {
         transferAccount.movements.push(amount);
+        transferAccount.movementsDates.push(currentDate.toISOString());
         currentAccount.movements.push(-amount);
+        currentAccount.movementsDates.push(currentDate.toISOString());
         updateUI(currentAccount)
         inputTransferTo.value = inputTransferAmount.value = '';
       } else {
