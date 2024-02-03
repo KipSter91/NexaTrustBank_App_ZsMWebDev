@@ -106,23 +106,23 @@ const welcomeText = () => {
   } else {
     return text[2];
   }
-}
+};
 
 
 //Sort movements
 // solution with using an array of functions;
+let currentState = 0;
 const sortFunctions = [
   () => currentAccount.movements, // Original order; with original array
   () => [...currentAccount.movements].sort((a, b) => a - b), // Ascending; with shallow copy
   () => [...currentAccount.movements].sort((a, b) => b - a), // Descending; with shallow copy
 ];
-let currentState = 0;
-
 btnSort.addEventListener('click', (e) => {
   e.preventDefault();
-  displayMovements();
   currentState = (currentState + 1) % sortFunctions.length;
+  displayMovements();
 });
+
 
 //Display movements
 const displayMovements = () => {
