@@ -84,15 +84,17 @@ createUserName(accounts);
 
 //Display dates
 const currentDate = new Date(Date.now());
-console.log(currentDate.toLocaleString().split(','));
 
-//Display formatted date
-labelDate.textContent = currentDate
-  .toLocaleDateString()
-  .split('/')
-  .map(number => number.padStart(2, 0))
-  .join('/')
 
+//Date variables
+const [weekday, month, day, year, time] = currentDate
+  .toString()
+  .split(' ');
+
+//Display date after LogIn
+labelDate.textContent = `${month}/${day}/${year}`
+
+console.log(month);
 //Display greetings text based on the current time of day
 const welcomeText = () => {
   const currentHour = currentDate.getHours();
@@ -107,15 +109,30 @@ const welcomeText = () => {
 }
 
 
+//Sort movements
+// solution with using an array of functions;
+const sortFunctions = [
+  () => currentAccount.movements, // Original order; with original array
+  () => [...currentAccount.movements].sort((a, b) => a - b), // Ascending; with shallow copy
+  () => [...currentAccount.movements].sort((a, b) => b - a), // Descending; with shallow copy
+];
+let currentState = 0;
+
+btnSort.addEventListener('click', (e) => {
+  e.preventDefault();
+  displayMovements();
+  currentState = (currentState + 1) % sortFunctions.length;
+});
+
 //Display movements
-const displayMovements = (acc) => {
+const displayMovements = () => {
   containerMovements.innerHTML = '';
-  acc.movements.forEach((mov, i) => {
+  sortFunctions[currentState]().forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movementHTML = `
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
-      <div class="movements__date">${new Date(acc.movementsDates[i]).toDateString()}</div>
+      <div class="movements__date">${new Date(currentAccount.movementsDates[i]).toDateString()}</div>
       <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>`
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
@@ -152,6 +169,7 @@ const displaySummary = (acc) => {
 
 //Login UI
 const LoginUI = () => {
+  window.scrollTo(0, 0);
   document.body.style.overflow = 'visible';
   btnLogOut.classList.remove('hidden');
   containerApp.classList.add('addopacity');
@@ -172,6 +190,7 @@ const createLogOutBtn = () => {
 
 //Logout UI
 const logOutUI = () => {
+  window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
   btnLogOut.classList.toggle('hidden');
   loginForm.classList.toggle('hidden');
@@ -184,7 +203,8 @@ const logOutUI = () => {
 
 //Update UI
 const updateUI = (acc) => {
-  displayMovements(acc);
+  currentState = 0;
+  displayMovements();
   displayBalance(acc);
   displaySummary(acc);
 }
@@ -272,7 +292,7 @@ btnTransfer.addEventListener('click', (e) => {
         transferAccount.movementsDates.push(currentDate.toISOString());
         currentAccount.movements.push(-amount);
         currentAccount.movementsDates.push(currentDate.toISOString());
-        updateUI(currentAccount)
+        updateUI(currentAccount);
         inputTransferTo.value = inputTransferAmount.value = '';
       } else {
         openModal(`Can't transfer a negative amount!`);
@@ -294,6 +314,7 @@ btnLoan.addEventListener('click', (e) => {
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     currentAccount.movements.push(amount);
+    currentAccount.movementsDates.push(currentDate.toISOString());
     updateUI(currentAccount);
     inputLoanAmount.value = '';
   } else {
@@ -316,19 +337,4 @@ btnClose.addEventListener('click', (e) => {
     openModal('Invalid user credentials!')
   }
   inputCloseUsername.value = inputClosePin.value = '';
-})
-
-//Sort movements
-// solution with using an array of functions;
-const sortFunctions = [
-  () => currentAccount.movements, // Original order; with original array
-  () => [...currentAccount.movements].sort((a, b) => a - b), // Ascending; with shallow copy
-  () => [...currentAccount.movements].sort((a, b) => b - a), // Descending; with shallow copy
-];
-let currentState = 0;
-
-btnSort.addEventListener('click', (e) => {
-  e.preventDefault();
-  displayMovements(sortFunctions[currentState]());
-  currentState = (currentState + 1) % sortFunctions.length;
 });
