@@ -129,6 +129,29 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 //Define the current date
 const currentDate = new Date();
+//Define the end time for the timer
+let endTime;
+//Define the timer interval
+let timerInterval;
+//Function to update the timer & log out the user
+const updateTimer = () => {
+  const timeRemaining = new Date(endTime * 1000);
+  endTime--;
+  console.log(endTime);
+  const minutes = timeRemaining.getMinutes();
+  const seconds = timeRemaining.getSeconds();
+  // Display the remaining time in a specific format (e.g., 05:30)
+  const timerDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  // Update the timer element with the display
+  labelTimer.textContent = timerDisplay;
+  // Check if the timer has reached zero
+  if (minutes === 0 && seconds === 0) {
+    // Log the user out
+    logOutUI();
+    openModal('Your session has expired!');
+  }
+};
+
 
 //Define the date format options
 const options = {
@@ -145,6 +168,7 @@ const options2 = {
   day: '2-digit'
 };
 
+
 //Function to format the currency
 const formatCurrency = (value, locale, currency) => {
   return new Intl.NumberFormat(locale, {
@@ -152,6 +176,7 @@ const formatCurrency = (value, locale, currency) => {
     currency: currency
   }).format(value);
 }
+
 
 //Cumpute usernames
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
@@ -256,6 +281,8 @@ const displaySummary = (acc) => {
 //Login UI
 const LoginUI = () => {
   window.scrollTo(0, 0);
+  endTime = 299;
+  timerInterval = setInterval(updateTimer, 1000);
   document.body.style.overflow = 'visible';
   btnLogOut.classList.remove('hidden');
   containerApp.classList.add('addopacity');
@@ -276,6 +303,8 @@ const createLogOutBtn = () => {
 
 //Logout UI
 const logOutUI = () => {
+  clearInterval(timerInterval);
+  labelTimer.textContent = '05:00';
   window.scrollTo(0, 0);
   document.body.style.overflow = 'hidden';
   btnLogOut.classList.toggle('hidden');
@@ -357,10 +386,10 @@ btnLogOut.addEventListener('click', () => {
 });
 
 
-//Getmovements from UI (Array.from function)
+//Getmovements from UI (Array.from function) 
 labelBalance.addEventListener('click', () => {
   const movementsUI = Array.from(document.querySelectorAll('.movements__value'), el => +el.textContent.slice(0, -1))
-  //with forEach method
+  //with forEach method 
   // const movementsUI = [];
   // getBalance.forEach(el => movementsUI.push(Number(el.textContent.slice(0, -1))));
   console.log(movementsUI);
@@ -399,9 +428,11 @@ btnLoan.addEventListener('click', (e) => {
   e.preventDefault();
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    currentAccount.movements.push(amount);
-    currentAccount.movementsDates.push(currentDate.toISOString());
-    updateUI(currentAccount);
+    setTimeout(() => {
+      currentAccount.movements.push(amount);
+      currentAccount.movementsDates.push(currentDate.toISOString());
+      updateUI(currentAccount);
+    }, 5000);
     inputLoanAmount.value = '';
   } else {
     openModal('Invalid loan request!');
@@ -418,7 +449,7 @@ btnClose.addEventListener('click', (e) => {
     accounts.splice(indexToRemove, 1);
     logOutUI();
     openModal(`Your account has been succesfully deleted.`);
-    console.log(accounts);
+    // console.log(accounts); //check if the account has been deleted
   } else {
     openModal('Invalid user credentials!')
   }

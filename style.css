@@ -464,10 +464,6 @@ h2 {
     padding: 2rem;
   }
 
-  .btn--sort {
-    display: none;
-  }
-
   .summary__label {
     padding-left: 2rem;
     text-align: left;
