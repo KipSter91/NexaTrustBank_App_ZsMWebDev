@@ -40,7 +40,57 @@ const account2 = {
   locale: "nl-NL"
 };
 
-const accounts = [account1, account2];
+const account3 = {
+  owner: 'Wilko Beukers',
+  movements: [15000, 14000, -2550.11, 790, -13210.21, 12000, 35000, -300, -5000, 10000, 1000, -1000],
+  interestRate: 2.2,
+  pin: 9999,
+  movementsDates: [
+    "2023-11-18T13:15:33.035Z",
+    "2023-12-23T09:48:16.867Z",
+    "2024-01-20T06:04:23.907Z",
+    "2024-01-21T14:18:46.235Z",
+    "2024-01-22T16:33:06.386Z",
+    "2024-01-23T14:43:26.374Z",
+    "2024-01-24T15:59:59.371Z",
+    "2024-01-26T01:01:20.894Z",
+    "2024-01-29T01:01:20.894Z",
+    "2024-01-30T01:01:20.894Z",
+    "2024-02-03T01:01:20.894Z",
+    "2024-02-04T01:01:20.894Z",
+  ],
+  currency: "EUR",
+  locale: "en-CH"
+};
+
+const account4 = {
+  owner: 'Győző Follath',
+  movements: [5000, 3400, -150.11, -790, -3210.21, -1000, 8500, -30, 200, 450, -400.29, 3000, -650.50, -130.99, 70, 1300],
+  interestRate: 1.7,
+  pin: 5555,
+  movementsDates: [
+    "2023-11-18T13:15:33.035Z",
+    "2023-12-23T09:48:16.867Z",
+    "2024-01-20T06:04:23.907Z",
+    "2024-01-21T14:18:46.235Z",
+    "2024-01-22T16:33:06.386Z",
+    "2024-01-23T14:43:26.374Z",
+    "2024-01-24T15:59:59.371Z",
+    "2024-01-26T01:01:20.894Z",
+    "2024-01-27T01:01:20.894Z",
+    "2024-01-29T01:01:20.894Z",
+    "2024-01-29T01:01:20.894Z",
+    "2024-01-30T01:01:20.894Z",
+    "2024-01-31T01:01:20.894Z",
+    "2024-02-02T01:01:20.894Z",
+    "2024-02-03T01:01:20.894Z",
+    "2024-02-04T01:01:20.894Z"
+  ],
+  currency: "EUR",
+  locale: "nl-NL"
+};
+
+const accounts = [account1, account2, account3, account4];
 
 
 // DOM Elements
@@ -77,24 +127,29 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
+//Define the current date
+const currentDate = new Date();
+
+//Define the date format options
+const options = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: 'numeric',
+  minute: 'numeric'
+};
+
+const options2 = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+};
+
 //Cumpute usernames
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
 createUserName(accounts);
 
 
-//Display dates
-const currentDate = new Date(Date.now());
-
-
-//Date variables
-const [weekday, month, day, year, time] = currentDate
-  .toString()
-  .split(' ');
-
-//Display date after LogIn
-labelDate.textContent = `${month}/${day}/${year}`
-
-console.log(month);
 //Display greetings text based on the current time of day
 const welcomeText = () => {
   const currentHour = currentDate.getHours();
@@ -124,16 +179,21 @@ btnSort.addEventListener('click', (e) => {
 });
 
 
-//Display movements
+//Display movements & dates
+const locale = navigator.language; //get the current browser language
+
 const displayMovements = () => {
+  //Display date after LogIn
+  labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(currentDate);
+  //Clear the container
   containerMovements.innerHTML = '';
+  //Display movements
   sortFunctions[currentState]().forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
     const movsDate = new Date(currentAccount.movementsDates[i]);
-    const curDate = new Date(currentDate);
 
     //Calculate days passed since the transaction was made and display the date accordingly
-    const daysPassed = (Math.round(Math.abs((curDate - movsDate) / (24 * 60 * 60 * 1000))));
+    const daysPassed = (Math.round(Math.abs((currentDate - movsDate) / (24 * 60 * 60 * 1000))));
 
     //Function to check the date and display it accordingly
     const checkDate = () => {
@@ -141,10 +201,10 @@ const displayMovements = () => {
       if (daysPassed === 1) return 'Yesterday';
       if (daysPassed <= 7) return `${daysPassed} days ago`;
       else {
-        return movsDate.toDateString()
+        return new Intl.DateTimeFormat(currentAccount.locale, options2).format(movsDate);
       }
     };
-
+    //Create the movement HTML element and insert it into the DOM
     const movementHTML = `
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
