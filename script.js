@@ -59,7 +59,7 @@ const account3 = {
     "2024-02-03T01:01:20.894Z",
     "2024-02-04T01:01:20.894Z",
   ],
-  currency: "EUR",
+  currency: "CHF",
   locale: "en-CH"
 };
 
@@ -145,6 +145,14 @@ const options2 = {
   day: '2-digit'
 };
 
+//Function to format the currency
+const formatCurrency = (value, locale, currency) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency
+  }).format(value);
+}
+
 //Cumpute usernames
 const createUserName = accs => accs.forEach(acc => acc.username = acc.owner.toLowerCase().split(' ').map(name => name.charAt()).join(''));
 createUserName(accounts);
@@ -209,7 +217,7 @@ const displayMovements = () => {
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
       <div class="movements__date">${checkDate()}</div>
-      <div class="movements__value">${mov.toFixed(2)}€</div>
+      <div class="movements__value">${formatCurrency(mov, currentAccount.locale, currentAccount.currency)}</div>
     </div>`
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
@@ -219,7 +227,7 @@ const displayMovements = () => {
 //Display balance
 const displayBalance = (acc) => {
   acc.balance = acc.movements.reduce((acc, cur) => acc + cur, 0)
-  labelBalance.textContent = `${acc.balance.toFixed(2)}€`
+  labelBalance.textContent = `${formatCurrency(acc.balance, acc.locale, acc.currency)}`
 }
 
 
@@ -234,14 +242,14 @@ const displaySummary = (acc) => {
     return acc;
   }, { sumIn: 0, sumOut: 0 });
 
-  labelSumIn.textContent = `${sumIn.toFixed(2)}€`;
-  labelSumOut.textContent = `${sumOut.toFixed(2)}€`;
-  labelSumInterest.textContent = `${acc.movements
+  labelSumIn.textContent = `${formatCurrency(sumIn, acc.locale, acc.currency)}`;
+  labelSumOut.textContent = `${formatCurrency(sumOut, acc.locale, acc.currency)}`;
+  labelSumInterest.textContent = `${formatCurrency(acc.movements
     .filter(mov => mov > 0)
     .map(deposit => deposit * acc.interestRate / 100)
     .filter(interest => interest >= 1)
-    .reduce((acc, interest) => acc + interest, 0).toFixed(2)
-    }€`
+    .reduce((acc, interest) => acc + interest, 0), acc.locale, acc.currency)
+    }`
 };
 
 
