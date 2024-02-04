@@ -12,10 +12,10 @@ const account1 = {
     "2023-12-23T07:42:02.383Z",
     "2024-01-20T09:15:04.904Z",
     "2024-01-21T10:17:24.185Z",
-    "2024-01-22T14:11:59.604Z",
-    "2024-01-24T17:01:17.194Z",
-    "2024-01-24T23:36:17.929Z",
-    "2024-01-26T10:51:36.790Z",
+    "2024-01-26T14:11:59.604Z",
+    "2024-01-29T17:01:17.194Z",
+    "2024-02-03T13:36:17.929Z",
+    "2024-02-04T10:51:36.790Z",
   ],
   currency: "EUR",
   locale: "nl-NL"
@@ -32,9 +32,9 @@ const account2 = {
     "2024-01-20T06:04:23.907Z",
     "2024-01-21T14:18:46.235Z",
     "2024-01-22T16:33:06.386Z",
-    "2024-01-24T14:43:26.374Z",
-    "2024-01-24T18:49:59.371Z",
-    "2024-01-26T12:01:20.894Z",
+    "2024-02-01T14:43:26.374Z",
+    "2024-02-03T15:59:59.371Z",
+    "2024-02-04T01:01:20.894Z",
   ],
   currency: "EUR",
   locale: "nl-NL"
@@ -129,21 +129,39 @@ const displayMovements = () => {
   containerMovements.innerHTML = '';
   sortFunctions[currentState]().forEach((mov, i) => {
     const depoOrWith = mov > 0 ? 'deposit' : 'withdrawal';
+    const movsDate = new Date(currentAccount.movementsDates[i]);
+    const curDate = new Date(currentDate);
+
+    //Calculate days passed since the transaction was made and display the date accordingly
+    const daysPassed = (Math.round(Math.abs((curDate - movsDate) / (24 * 60 * 60 * 1000))));
+
+    //Function to check the date and display it accordingly
+    const checkDate = () => {
+      if (daysPassed === 0) return 'Today';
+      if (daysPassed === 1) return 'Yesterday';
+      if (daysPassed <= 7) return `${daysPassed} days ago`;
+      else {
+        return movsDate.toDateString()
+      }
+    };
+
     const movementHTML = `
     <div class= "movements__row">
       <div class="movements__type movements__type--${depoOrWith}">${i + 1}. ${depoOrWith}</div>
-      <div class="movements__date">${new Date(currentAccount.movementsDates[i]).toDateString()}</div>
+      <div class="movements__date">${checkDate()}</div>
       <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>`
     containerMovements.insertAdjacentHTML('afterbegin', movementHTML);
   });
 };
 
+
 //Display balance
 const displayBalance = (acc) => {
   acc.balance = acc.movements.reduce((acc, cur) => acc + cur, 0)
   labelBalance.textContent = `${acc.balance.toFixed(2)}€`
 }
+
 
 //Display summary
 const displaySummary = (acc) => {

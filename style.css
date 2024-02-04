@@ -464,8 +464,31 @@ h2 {
     padding: 2rem;
   }
 
-  .summary {
+  .btn--sort {
     display: none;
+  }
+
+  .summary__label {
+    padding-left: 2rem;
+    text-align: left;
+  }
+
+  .summary__value {
+    padding-right: 1rem;
+    text-align: right;
+  }
+
+  .summary {
+    box-shadow: 0.5em 0 0.5em #33c1b5;
+    border-radius: 2rem;
+    border: 1px solid #ccc;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(2, 46.5vw);
+  }
+
+  .summary:hover {
+    animation: shadowRotate 2s linear infinite;
   }
 
   .nav__login {
