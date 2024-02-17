@@ -248,6 +248,7 @@ const displayMovements = () => {
   });
 };
 
+// 
 
 //Display balance
 const displayBalance = (acc) => {
