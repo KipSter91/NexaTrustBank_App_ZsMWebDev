@@ -420,7 +420,7 @@ btnTransfer.addEventListener('click', (e) => {
     }
   } else {
     openModal('Invalid transfer account!');
-    inputTransferTo.value = inputTransferAmount.value = '';
+    inputTransferTo.value = inputTransferAmount.value = ''; 
   };
 });
 
