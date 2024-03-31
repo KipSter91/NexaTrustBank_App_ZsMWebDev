@@ -74,6 +74,7 @@ console.log(link.href); // Returns the absolute URL of the href attribute
 //Data attributes
 console.log(logo.dataset.versionNumber); // Returns the value of the data-version-number attribute
 
+
 //Classes
 logo.classList.add('c', 'j'); // Adds the classes 'c' and 'j' to the element you can add multiple classes at once by separating them with a comma
 logo.classList.remove('c', 'j');
@@ -84,27 +85,18 @@ logo.classList.contains('c', 'j');
 logo.className = 'zsolt';
 logo.className = 'nav__logo';
 
+
 //Implementing Smooth Scrolling
 const buttonScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
 
-//modern way
-// buttonScrollTo.addEventListener('click', () => {
-//     section1.scrollIntoView({ behavior: 'smooth' })
-// });
-
-//Oldschool way
-buttonScrollTo.addEventListener('click', (e) => {
-    const s1coords = section1.getBoundingClientRect();
-    window.scrollTo({
-        left: s1coords.left + window.scrollX,
-        top: s1coords.top + window.scrollY,
-        behavior: 'smooth'
-    })
+//Modern way
+buttonScrollTo.addEventListener('click', () => {
+    section1.scrollIntoView({ behavior: 'smooth' })
 });
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    anchor.addEventListener('click', function (e) {
         e.preventDefault();
 
         const target = document.querySelector(this.getAttribute('href'));
@@ -116,3 +108,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         });
     });
 });
+
+//Oldschool way
+// buttonScrollTo.addEventListener('click', (e) => {
+//     const s1coords = section1.getBoundingClientRect();
+//     window.scrollTo({
+//         left: s1coords.left + window.scrollX,
+//         top: s1coords.top + window.scrollY,
+//         behavior: 'smooth'
+//     })
+// });
+
+//Types of Events and Event Handlers
+//Mouse Events
+const h1 = document.querySelector('h1');
+const alertH1 = (e) => {
+    alert('addEventListener: Great, you are reading the heading!')
+    removeEventListener('mouseenter', alertH1);
+};
+
+//Modern handling of events you can add multiple event listeners to the same element
+h1.addEventListener('mouseenter', alertH1);
+
+//Oldschool handling of events you can add only one event listener to the same element
+// h1.onmouseenter = () => {
+//     alert('onmouseenter: Great, your cursor is just hovered over the H1 element!')
+// }
+
+//Removing event listeners
+setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
