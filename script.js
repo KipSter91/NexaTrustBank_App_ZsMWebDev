@@ -83,3 +83,36 @@ logo.classList.contains('c', 'j');
 // Don't use this method because it will overwrite all existing classes
 logo.className = 'zsolt';
 logo.className = 'nav__logo';
+
+//Implementing Smooth Scrolling
+const buttonScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+
+//modern way
+// buttonScrollTo.addEventListener('click', () => {
+//     section1.scrollIntoView({ behavior: 'smooth' })
+// });
+
+//Oldschool way
+buttonScrollTo.addEventListener('click', (e) => {
+    const s1coords = section1.getBoundingClientRect();
+    window.scrollTo({
+        left: s1coords.left + window.scrollX,
+        top: s1coords.top + window.scrollY,
+        behavior: 'smooth'
+    })
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const target = document.querySelector(this.getAttribute('href'));
+        const offsetTop = target.offsetTop;
+
+        window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+        });
+    });
+});
