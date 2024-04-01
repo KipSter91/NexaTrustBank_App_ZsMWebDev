@@ -1,13 +1,84 @@
 'use strict'   // JavaScript strict mode
 
-//Selecting, Creating, and Deleting Elements
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////WEBSITE//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Creating the cookie-message
+const header = document.querySelector('.header');  // Selects the first element with the class 'header'
+const message = document.createElement('div'); // Create a new element
+message.classList.add('cookie-message');
+message.classList.add('hidden') // Add a class to the element
+message.innerHTML = 'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>'; //Add HTML to the element
+document.body.appendChild(message); // Add the element as the last child of the header element
+
+
+// Show the cookie message
+setTimeout(() => {
+    message.style.bottom = 0;
+    message.classList.remove('hidden');
+}, 1000); // Delayed appearance for smoother effect
+
+
+//Formatting the cookie message style with JS
+message.style.backgroundColor = '#37383d';
+message.style.width = '100vw';
+message.style.height = Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
+
+
+//Deleting the cookie message
+document.querySelector('.btn--close-cookie').addEventListener('click', () => {
+    message.style.bottom = '-100px';
+    setTimeout(() => {
+        message.remove();
+    }, 300); // Delay removal to ensure smooth transition
+});
+
+
+//Implementing smooth scrolling for the button on the welcome screen
+const buttonScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+
+buttonScrollTo.addEventListener('click', () => {
+    section1.scrollIntoView({ behavior: 'smooth' })
+});
+
+
+//Implementing smooth scrolling for the nav bar buttons (my own version 1.0)
+//BUT THIS IS NOT EFFICIENT with huge website because it will create a new event listener for each button
+// document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+//     anchor.addEventListener('click', function (e) {
+//         e.preventDefault();
+
+//         const target = document.querySelector(this.getAttribute('href'));
+//         const offsetTop = target.offsetTop;
+
+//         window.scrollTo({
+//             top: offsetTop,
+//             behavior: 'smooth'
+//         });
+//     });
+// });
+
+
+//Efficient way to implement smooth scrolling for the nav bar buttons (with event delegation; (my own version 2.0))
+header.addEventListener('click', function (e) {
+    if (e.target.matches('a[href^="#"]')) { // Check if the clicked element is an anchor with href starting with '#'
+        e.preventDefault();
+        document.getElementById(e.target.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
+    }
+});
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Selecting, Creating, and Deleting Elements
 //Selecting Elements
 // console.log(document.documentElement); // <html> element
 // console.log(document.head); // <head> element
 // console.log(document.body); // <body> element
-
-const header = document.querySelector('.header');  // Selects the first element with the class 'header'
 
 // const allSections = document.querySelectorAll('.section'); // Selects all elements with the class 'section'
 // console.log(allSections);
@@ -22,39 +93,17 @@ const header = document.querySelector('.header');  // Selects the first element 
 //Creating and Inserting Elements
 // .insertAdjacentHTML
 
-const message = document.createElement('div'); // Create a new element
-message.classList.add('cookie-message');
-message.classList.add('hidden') // Add a class to the element
 // message.textContent = 'Weuse cookies for improved functionality and analytics.'; // Add text to the element
-message.innerHTML = 'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>'; //Add HTML to the element
 
 // header.prepend(message); // Add the element as the first child of the header element
-document.body.appendChild(message); // Add the element as the last child of the header element
-// Show the cookie message
-setTimeout(() => {
-    message.style.bottom = 0;
-    message.classList.remove('hidden');
-}, 1000); // Delayed appearance for smoother effect
-
 // header.append(message.cloneNode(true)); // Add a copy of the element as the last child of the header element
 
 // header.before(message); // Add the element before the header element (sibling element
 // header.after(message); // Add the element after the header element
 
-// Delete Elements
-document.querySelector('.btn--close-cookie').addEventListener('click', () => {
-    message.style.bottom = '-100px';
-    setTimeout(() => {
-        message.remove();
-    }, 300); // Delay removal to ensure smooth transition
-});
 
 // Styles, Attributes, and Classes
-
 // // Styles
-message.style.backgroundColor = '#37383d';
-message.style.width = '100vw';
-message.style.height = Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
 
 // console.log(message.style.color); // Returns the inline style of the element
 // console.log(message.style.backgroundColor); // Returns the inline style of the element
@@ -99,28 +148,6 @@ message.style.height = Number.parseFloat(getComputedStyle(message).height, 10) +
 
 
 //Implementing Smooth Scrolling
-const buttonScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
-
-//Modern way
-buttonScrollTo.addEventListener('click', () => {
-    section1.scrollIntoView({ behavior: 'smooth' })
-});
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        const target = document.querySelector(this.getAttribute('href'));
-        const offsetTop = target.offsetTop;
-
-        window.scrollTo({
-            top: offsetTop,
-            behavior: 'smooth'
-        });
-    });
-});
-
 //Oldschool way
 // buttonScrollTo.addEventListener('click', (e) => {
 //     const s1coords = section1.getBoundingClientRect();
@@ -151,19 +178,19 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
 
 //Event propagation in practice
-const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const randomColor = () => `rgba(${getRandomInt(0, 255)},${getRandomInt(0, 255)},${getRandomInt(0, 255)})`;
+// const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+// const randomColor = () => `rgba(${getRandomInt(0, 255)},${getRandomInt(0, 255)},${getRandomInt(0, 255)})`;
 
-console.log(randomColor());
+// console.log(randomColor());
 
-document.querySelectorAll('.nav__link').forEach(link => link.addEventListener('click', function (e) {
-    this.style.backgroundColor = randomColor();
-}));
+// document.querySelectorAll('.nav__link').forEach(link => link.addEventListener('click', function (e) {
+//     this.style.backgroundColor = randomColor();
+// }));
 
-document.querySelector('.nav__links').addEventListener('click', function (e) {
-    this.style.backgroundColor = randomColor();
-});
+// document.querySelector('.nav__links').addEventListener('click', function (e) {
+//     this.style.backgroundColor = randomColor();
+// });
 
-document.querySelector('.nav').addEventListener('click', function (e) {
-    this.style.backgroundColor = randomColor();
-});
+// document.querySelector('.nav').addEventListener('click', function (e) {
+//     this.style.backgroundColor = randomColor();
+// });
