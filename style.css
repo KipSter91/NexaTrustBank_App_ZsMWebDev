@@ -2,7 +2,7 @@
 
 :root {
   --color-primary: #33c1b5;
-  --color-secondary: #02549B;
+  --color-secondary: #02549b;
   --color-tertiary: #f5465d;
   --color-primary-darker: #2ba399;
   --color-secondary-darker: rgb(9, 76, 128);
@@ -10,7 +10,7 @@
   --color-primary-opacity: #5ec5763a;
   --color-secondary-opacity: #ffcd0331;
   --color-tertiary-opacity: #ff58602d;
-  --gradient-primary: linear-gradient(to top left, #39b385, #02549B);
+  --gradient-primary: linear-gradient(to top left, #39b385, #02549b);
   --gradient-secondary: linear-gradient(to top left, #042741, #042741);
 }
 
@@ -598,6 +598,9 @@ h4 {
 /* COOKIE MESSAGE */
 .cookie-message {
   display: flex;
+  position: fixed;
+  bottom: -100px;
+  left: 0;
   align-items: center;
   justify-content: space-evenly;
   width: 100%;
@@ -605,4 +608,5 @@ h4 {
   color: #bbb;
   font-size: 1.5rem;
   font-weight: 400;
+  transition: bottom 0.3s ease-in-out;
 }
