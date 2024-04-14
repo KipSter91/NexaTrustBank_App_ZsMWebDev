@@ -96,6 +96,7 @@ tabsContainer.addEventListener('click', function (e) {
     correspondingContent.classList.add('operations__content--active')
 });
 
+
 //Menu fade animation
 //Version A) without bind method
 //creating a new function to make our code a bit more dry
@@ -114,7 +115,6 @@ tabsContainer.addEventListener('click', function (e) {
 // nav.addEventListener('mouseover', event => opacityControl(event, 0.5));
 // //unhovered with mouse
 // nav.addEventListener('mouseout', event => opacityControl(event, 1));
-
 
 //Version B with bind method, can't use arrow function
 const opacityControl2 = function (e) {
@@ -135,7 +135,14 @@ nav.addEventListener('mouseover', opacityControl2.bind(0.5));
 nav.addEventListener('mouseout', opacityControl2.bind(1));
 
 
+//Sticky navbar
+//Performance killer version (using the scroll event listener)
+const stickNavCoords = section1.getBoundingClientRect();
 
+window.addEventListener('scroll', e => {
+    if (window.scrollY >= stickNavCoords.top) nav.classList.add('sticky')
+    else nav.classList.remove('sticky')
+})
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
