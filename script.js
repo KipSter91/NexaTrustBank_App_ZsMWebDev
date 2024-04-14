@@ -137,13 +137,27 @@ nav.addEventListener('mouseout', opacityControl2.bind(1));
 
 //Sticky navbar
 //Performance killer version (using the scroll event listener)
-const stickNavCoords = section1.getBoundingClientRect();
+// const stickNavCoords = section1.getBoundingClientRect();
 
-window.addEventListener('scroll', e => {
-    if (window.scrollY >= stickNavCoords.top) nav.classList.add('sticky')
-    else nav.classList.remove('sticky')
+// window.addEventListener('scroll', e => {
+//     if (window.scrollY >= stickNavCoords.top) nav.classList.add('sticky')
+//     else nav.classList.remove('sticky')
+// })
+
+//Sticky navbar using Intersection Observer API
+const navHeight = nav.getBoundingClientRect().height;
+const stickyNav = entries => {
+    const [entry] = entries;
+    !entry.isIntersecting ? nav.classList.add('sticky') : nav.classList.remove('sticky')
+}
+
+const headerObserver = new IntersectionObserver(stickyNav, {
+    root: null,
+    threshold: 0,
+    rootMargin: `-${navHeight}px`
 })
 
+headerObserver.observe(header);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
