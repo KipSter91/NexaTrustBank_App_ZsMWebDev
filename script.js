@@ -5,7 +5,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Creating the cookie-message
-const header = document.querySelector('.header');  // Selects the first element with the class 'header'
+const header = document.querySelector('.header'); // Selects the first element with the class 'header'
+const nav = document.querySelector('.nav');
 const message = document.createElement('div'); // Create a new element
 message.classList.add('cookie-message');
 message.classList.add('hidden') // Add a class to the element
@@ -94,6 +95,47 @@ tabsContainer.addEventListener('click', function (e) {
     console.log(correspondingContent);
     correspondingContent.classList.add('operations__content--active')
 });
+
+//Menu fade animation
+//Version A) without bind method
+//creating a new function to make our code a bit more dry
+// const opacityControl = (event, opacityValue) => {
+//     if (event.target.classList.contains('nav__link')) {
+//         const hovered = event.target;
+//         const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
+//         const logo = hovered.closest('.nav').querySelector('img');
+//         siblings.forEach(el => {
+//             if (el !== hovered) el.style.opacity = opacityValue;
+//         })
+//         logo.style.opacity = opacityValue
+//     }
+// }
+// //hovered with mouse
+// nav.addEventListener('mouseover', event => opacityControl(event, 0.5));
+// //unhovered with mouse
+// nav.addEventListener('mouseout', event => opacityControl(event, 1));
+
+
+//Version B with bind method, can't use arrow function
+const opacityControl2 = function (e) {
+    if (e.target.classList.contains('nav__link')) {
+        const hovered = e.target;
+        const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
+        const logo = hovered.closest('.nav').querySelector('img');
+        siblings.forEach(el => {
+            if (el !== hovered) el.style.opacity = this;
+        })
+        logo.style.opacity = this;
+    };
+};
+//Passing "argument" into handler
+//hovered with mouse
+nav.addEventListener('mouseover', opacityControl2.bind(0.5));
+//unhovered with mouse
+nav.addEventListener('mouseout', opacityControl2.bind(1));
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
