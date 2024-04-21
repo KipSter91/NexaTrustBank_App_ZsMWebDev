@@ -6,6 +6,10 @@
 
 //Creating the cookie-message
 const header = document.querySelector('.header'); // Selects the first element with the class 'header'
+const sections = document.querySelectorAll('.section');
+const body = document.querySelector('body');
+console.log(body);
+console.log(sections);
 const nav = document.querySelector('.nav');
 const message = document.createElement('div'); // Create a new element
 message.classList.add('cookie-message');
@@ -159,6 +163,26 @@ const headerObserver = new IntersectionObserver(stickyNav, {
 })
 
 headerObserver.observe(header);
+
+//Sections reveal-on
+const revealSect = (entries, observer) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.remove('section--hidden')
+        observer.unobserve(entry.target)
+    })
+}
+
+const sectionObserver = new IntersectionObserver(revealSect, {
+    root: null,
+    threshold: 0.20,
+})
+
+sections.forEach(section => {
+    sectionObserver.observe(section);
+    section.classList.add('section--hidden')
+});
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
