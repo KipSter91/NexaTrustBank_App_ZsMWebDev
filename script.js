@@ -117,7 +117,7 @@ tabsContainer.addEventListener('click', function (e) {
 // nav.addEventListener('mouseout', event => opacityControl(event, 1));
 
 //Version B with bind method, can't use arrow function
-const opacityControl2 = function (e) {
+const opacityControl = function (e) {
     if (e.target.classList.contains('nav__link')) {
         const hovered = e.target;
         const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
@@ -130,9 +130,9 @@ const opacityControl2 = function (e) {
 };
 //Passing "argument" into handler
 //hovered with mouse
-nav.addEventListener('mouseover', opacityControl2.bind(0.5));
+nav.addEventListener('mouseover', opacityControl.bind(0.5));
 //unhovered with mouse
-nav.addEventListener('mouseout', opacityControl2.bind(1));
+nav.addEventListener('mouseout', opacityControl.bind(1));
 
 
 //Sticky navbar
@@ -147,8 +147,9 @@ nav.addEventListener('mouseout', opacityControl2.bind(1));
 //Sticky navbar using Intersection Observer API
 const navHeight = nav.getBoundingClientRect().height;
 const stickyNav = entries => {
-    const [entry] = entries;
-    !entry.isIntersecting ? nav.classList.add('sticky') : nav.classList.remove('sticky')
+    entries.forEach(entry => {
+        !entry.isIntersecting ? nav.classList.add('sticky') : nav.classList.remove('sticky')
+    })
 }
 
 const headerObserver = new IntersectionObserver(stickyNav, {
