@@ -208,6 +208,58 @@ const imgObserver = new IntersectionObserver(loadImg, {
 imgTargets.forEach(img => imgObserver.observe(img));
 
 
+/// Slider
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+
+let currentSlide = 0;
+const maxSlide = slides.length - 1;
+
+// Initialize the slider: position slides without transition
+const initSlider = () => {
+    slides.forEach((slide, index) => {
+        slide.style.transform = `translateX(${100 * index}%)`;
+        slide.style.transition = 'none'
+    });
+}
+
+// Enable slide transition after initial positioning
+const enableTransition = () => {
+    slides.forEach(slide => {
+        slide.style.transition = 'transform 1s';
+    });
+};
+
+// Go to a specific slide
+const goToSlide = (slideIndex) => {
+    slides.forEach((slide, index) => {
+        slide.style.transform = `translateX(${100 * (index - slideIndex)}%)`;
+        enableTransition();
+    });
+};
+
+// Move to the previous slide
+const prevSlide = () => {
+    currentSlide = currentSlide === 0 ? maxSlide : currentSlide - 1;
+    goToSlide(currentSlide);
+};
+
+// Move to the next slide
+const nextSlide = () => {
+    currentSlide = currentSlide === maxSlide ? 0 : currentSlide + 1;
+    goToSlide(currentSlide);
+};
+
+// Event listeners for navigation buttons
+btnLeft.addEventListener('click', prevSlide);
+btnRight.addEventListener('click', nextSlide);
+
+// Initialize the slider
+initSlider();
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
