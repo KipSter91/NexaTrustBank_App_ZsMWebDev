@@ -8,8 +8,8 @@
 const header = document.querySelector('.header'); // Selects the first element with the class 'header'
 const sections = document.querySelectorAll('.section');
 const body = document.querySelector('body');
-console.log(body);
-console.log(sections);
+// console.log(body);
+// console.log(sections);
 const nav = document.querySelector('.nav');
 const message = document.createElement('div'); // Create a new element
 message.classList.add('cookie-message');
@@ -182,6 +182,31 @@ sections.forEach(section => {
     sectionObserver.observe(section);
     section.classList.add('section--hidden')
 });
+
+
+//Lazy loading images
+const imgTargets = document.querySelectorAll('img[data-src]');
+
+const loadImg = (entries, observer) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        entry.target.src = entry.target.dataset.src;
+        entry.target.addEventListener('load', () => {
+            // Remove the lazy-img class after the image is loaded
+            entry.target.classList.remove('lazy-img');
+        });
+        observer.unobserve(entry.target)
+    })
+
+}
+
+const imgObserver = new IntersectionObserver(loadImg, {
+    root: null,
+    threshold: 0
+})
+
+imgTargets.forEach(img => imgObserver.observe(img));
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
