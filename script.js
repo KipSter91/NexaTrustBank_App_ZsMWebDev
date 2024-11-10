@@ -1,268 +1,255 @@
-'use strict'   // JavaScript strict mode
+'use strict';
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////WEBSITE//////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//Creating the cookie-message
-const header = document.querySelector('.header'); // Selects the first element with the class 'header'
-const sections = document.querySelectorAll('.section');
-const body = document.querySelector('body');
-// console.log(body);
-// console.log(sections);
+// Global Variables
+const header = document.querySelector('.header');
 const nav = document.querySelector('.nav');
-const message = document.createElement('div'); // Create a new element
-message.classList.add('cookie-message');
-message.classList.add('hidden') // Add a class to the element
-message.innerHTML = 'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>'; //Add HTML to the element
-document.body.appendChild(message); // Add the element as the last child of the header element
-
-
-// Show the cookie message
-setTimeout(() => {
-    message.style.bottom = 0;
-    message.classList.remove('hidden');
-}, 1000); // Delayed appearance for smoother effect
-
-
-//Formatting the cookie message style with JS
-message.style.backgroundColor = '#37383d';
-message.style.width = '100vw';
-message.style.height = Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
-
-
-//Deleting the cookie message
-document.querySelector('.btn--close-cookie').addEventListener('click', () => {
-    message.style.bottom = '-100px';
-    setTimeout(() => {
-        message.remove();
-    }, 300); // Delay removal to ensure smooth transition
-});
-
-
-//Implementing smooth scrolling for the button on the welcome screen
+const sections = document.querySelectorAll('.section');
+const body = document.body;
 const buttonScrollTo = document.querySelector('.btn--scroll-to');
+const btnLogin = document.querySelector('.btn--login');
 const section1 = document.querySelector('#section--1');
 
-buttonScrollTo.addEventListener('click', () => {
-    section1.scrollIntoView({ behavior: 'smooth' })
+// Initialize Website
+document.addEventListener('DOMContentLoaded', () => {
+    createCookieMessage();
+    loginBtn();
+    setupSmoothScroll();
+    setupTabbedComponent();
+    setupNavAnimation();
+    setupStickyNavbar();
+    setupSectionReveal();
+    setupLazyLoading();
+    setupSlider();
 });
 
+// Cookie Message
+function createCookieMessage() {
+    const message = document.createElement('div');
+    message.classList.add('cookie-message', 'hidden');
+    message.innerHTML = `
+        We use cookies for improved functionality and analytics. 
+        <button class="btn btn--close-cookie">Got it!</button>`;
+    body.appendChild(message);
 
-//Implementing smooth scrolling for the nav bar buttons (my own version 1.0)
-//BUT THIS IS NOT EFFICIENT with huge website because it will create a new event listener for each button
-// document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-//     anchor.addEventListener('click', function (e) {
-//         e.preventDefault();
+    // Show the cookie message after a delay
+    setTimeout(() => {
+        message.classList.remove('hidden');
+        message.style.bottom = '0';
+    }, 1000);
 
-//         const target = document.querySelector(this.getAttribute('href'));
-//         const offsetTop = target.offsetTop;
+    // Style the message
+    Object.assign(message.style, {
+        backgroundColor: '#37383d',
+        width: '100vw',
+        height: `${parseFloat(getComputedStyle(message).height) + 30}px`,
+    });
 
-//         window.scrollTo({
-//             top: offsetTop,
-//             behavior: 'smooth'
-//         });
-//     });
-// });
+    // Delete the cookie message on button click
+    document.querySelector('.btn--close-cookie').addEventListener('click', () => {
+        message.style.bottom = '-100px';
+        setTimeout(() => message.remove(), 1000);
+    });
+}
 
+// Smooth Scrolling for Buttons
+function setupSmoothScroll() {
+    buttonScrollTo.addEventListener('click', () => {
+        section1.scrollIntoView({ behavior: 'smooth' });
+    });
 
-//Efficient way to implement smooth scrolling for the nav bar buttons (with event delegation; (my own version 2.0))
-header.addEventListener('click', function (e) {
-    if (e.target.matches('a[href^="#"]')) { // Check if the clicked element is an anchor with href starting with '#'
-        e.preventDefault();
-        document.getElementById(e.target.getAttribute('href').substring(1)).scrollIntoView({ behavior: 'smooth' });
-    }
-});
+    // Delegate smooth scrolling to header links
+    header.addEventListener('click', e => {
+        if (e.target.matches('a[href^="#"]')) {
+            e.preventDefault();
+            const targetId = e.target.getAttribute('href').substring(1);
+            document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+}
 
-//Tabbed components
-const tabs = document.querySelectorAll('.operations__tab');
-const tabsContainer = document.querySelector('.operations__tab-container');
-const tabsContent = document.querySelectorAll('.operations__content');
+// Tabbed Component
+function setupTabbedComponent() {
+    const tabsContainer = document.querySelector('.operations__tab-container');
+    const tabs = document.querySelectorAll('.operations__tab');
+    const tabsContent = document.querySelectorAll('.operations__content');
 
-tabsContainer.addEventListener('click', function (e) {
-    const clickedTab = e.target.closest('.operations__tab');
+    tabsContainer.addEventListener('click', e => {
+        const clickedTab = e.target.closest('.operations__tab');
+        if (!clickedTab) return;
 
-    // Guard clause
-    if (!clickedTab) return;
+        // Remove active classes
+        tabs.forEach(tab => tab.classList.remove('operations__tab--active'));
+        tabsContent.forEach(content =>
+            content.classList.remove('operations__content--active')
+        );
 
-    // Remove active classes from all tabs and contents
-    tabs.forEach(tab => tab.classList.remove('operations__tab--active'));
-    tabsContent.forEach(content => content.classList.remove('operations__content--active'));
+        // Activate clicked tab and corresponding content
+        clickedTab.classList.add('operations__tab--active');
+        document
+            .querySelector(`.operations__content--${clickedTab.dataset.tab}`)
+            .classList.add('operations__content--active');
+    });
+}
 
-    // Activate clicked tab
-    clickedTab.classList.add('operations__tab--active');
-
-    // Activate corresponding content
-    const contentId = clickedTab.dataset.tab;
-    console.log(contentId);
-    const correspondingContent = document.querySelector(`.operations__content--${contentId}`);
-    console.log(correspondingContent);
-    correspondingContent.classList.add('operations__content--active')
-});
-
-
-//Menu fade animation
-//Version A) without bind method
-//creating a new function to make our code a bit more dry
-// const opacityControl = (event, opacityValue) => {
-//     if (event.target.classList.contains('nav__link')) {
-//         const hovered = event.target;
-//         const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
-//         const logo = hovered.closest('.nav').querySelector('img');
-//         siblings.forEach(el => {
-//             if (el !== hovered) el.style.opacity = opacityValue;
-//         })
-//         logo.style.opacity = opacityValue
-//     }
-// }
-// //hovered with mouse
-// nav.addEventListener('mouseover', event => opacityControl(event, 0.5));
-// //unhovered with mouse
-// nav.addEventListener('mouseout', event => opacityControl(event, 1));
-
-//Version B with bind method, can't use arrow function
-const opacityControl = function (e) {
-    if (e.target.classList.contains('nav__link')) {
-        const hovered = e.target;
-        const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
-        const logo = hovered.closest('.nav').querySelector('img');
-        siblings.forEach(el => {
-            if (el !== hovered) el.style.opacity = this;
-        })
-        logo.style.opacity = this;
+// Navigation Fade Animation
+function setupNavAnimation() {
+    const handleHover = function (e) {
+        if (e.target.classList.contains('nav__link')) {
+            const hovered = e.target;
+            const siblings = hovered.closest('.nav').querySelectorAll('.nav__link');
+            const logo = hovered.closest('.nav').querySelector('img');
+            siblings.forEach(el => {
+                if (el !== hovered) el.style.opacity = this;
+            });
+            logo.style.opacity = this;
+        }
     };
-};
-//Passing "argument" into handler
-//hovered with mouse
-nav.addEventListener('mouseover', opacityControl.bind(0.5));
-//unhovered with mouse
-nav.addEventListener('mouseout', opacityControl.bind(1));
-
-
-//Sticky navbar
-//Performance killer version (using the scroll event listener)
-// const stickNavCoords = section1.getBoundingClientRect();
-
-// window.addEventListener('scroll', e => {
-//     if (window.scrollY >= stickNavCoords.top) nav.classList.add('sticky')
-//     else nav.classList.remove('sticky')
-// })
-
-//Sticky navbar using Intersection Observer API
-const navHeight = nav.getBoundingClientRect().height;
-const stickyNav = entries => {
-    entries.forEach(entry => {
-        !entry.isIntersecting ? nav.classList.add('sticky') : nav.classList.remove('sticky')
-    })
+    nav.addEventListener('mouseover', handleHover.bind(0.5));
+    nav.addEventListener('mouseout', handleHover.bind(1));
 }
 
-const headerObserver = new IntersectionObserver(stickyNav, {
-    root: null,
-    threshold: 0,
-    rootMargin: `-${navHeight}px`
-})
+// Sticky Navbar using Intersection Observer API
+function setupStickyNavbar() {
+    const navHeight = nav.getBoundingClientRect().height;
 
-headerObserver.observe(header);
+    const stickyNav = entries => {
+        const [entry] = entries;
+        nav.classList.toggle('sticky', !entry.isIntersecting);
+    };
 
-//Sections reveal-on
-const revealSect = (entries, observer) => {
-    entries.forEach(entry => {
-        if (!entry.isIntersecting) return
-        entry.target.classList.remove('section--hidden')
-        observer.unobserve(entry.target)
-    })
+    const headerObserver = new IntersectionObserver(stickyNav, {
+        root: null,
+        threshold: 0,
+        rootMargin: `-${navHeight}px`,
+    });
+
+    headerObserver.observe(header);
 }
 
-const sectionObserver = new IntersectionObserver(revealSect, {
-    root: null,
-    threshold: 0.20,
-})
-
-sections.forEach(section => {
-    sectionObserver.observe(section);
-    section.classList.add('section--hidden')
-});
-
-
-//Lazy loading images
-const imgTargets = document.querySelectorAll('img[data-src]');
-
-const loadImg = (entries, observer) => {
-    entries.forEach(entry => {
-        if (!entry.isIntersecting) return
-        entry.target.src = entry.target.dataset.src;
-        entry.target.addEventListener('load', () => {
-            // Remove the lazy-img class after the image is loaded
-            entry.target.classList.remove('lazy-img');
+// Section Reveal on Scroll
+function setupSectionReveal() {
+    const revealSection = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('section--hidden');
+                observer.unobserve(entry.target);
+            }
         });
-        observer.unobserve(entry.target)
-    })
+    };
 
-}
+    const sectionObserver = new IntersectionObserver(revealSection, {
+        root: null,
+        threshold: 0.2,
+    });
 
-const imgObserver = new IntersectionObserver(loadImg, {
-    root: null,
-    threshold: 0
-})
-
-imgTargets.forEach(img => imgObserver.observe(img));
-
-
-/// Slider
-const slides = document.querySelectorAll('.slide');
-const btnLeft = document.querySelector('.slider__btn--left');
-const btnRight = document.querySelector('.slider__btn--right');
-
-let currentSlide = 0;
-const maxSlide = slides.length - 1;
-
-// Initialize the slider: position slides without transition
-const initSlider = () => {
-    slides.forEach((slide, index) => {
-        slide.style.transform = `translateX(${100 * index}%)`;
-        slide.style.transition = 'none'
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+        section.classList.add('section--hidden');
     });
 }
 
-// Enable slide transition after initial positioning
-const enableTransition = () => {
-    slides.forEach(slide => {
-        slide.style.transition = 'transform 1s';
+// Lazy Loading Images
+function setupLazyLoading() {
+    const imgTargets = document.querySelectorAll('img[data-src]');
+
+    const loadImg = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.src = entry.target.dataset.src;
+                entry.target.addEventListener('load', () => {
+                    entry.target.classList.remove('lazy-img');
+                });
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const imgObserver = new IntersectionObserver(loadImg, {
+        root: null,
+        threshold: 0,
     });
-};
+    imgTargets.forEach(img => imgObserver.observe(img));
+}
 
-// Go to a specific slide
-const goToSlide = (slideIndex) => {
-    slides.forEach((slide, index) => {
-        slide.style.transform = `translateX(${100 * (index - slideIndex)}%)`;
-        enableTransition();
+// Slider Component
+function setupSlider() {
+    const slides = document.querySelectorAll('.slide');
+    const btnLeft = document.querySelector('.slider__btn--left');
+    const btnRight = document.querySelector('.slider__btn--right');
+    const dotContainer = document.querySelector('.dots');
+    let currentSlide = 0;
+    const maxSlide = slides.length - 1;
+
+    const createDots = () => {
+        slides.forEach((_, index) => {
+            dotContainer.insertAdjacentHTML(
+                'beforeend',
+                `<button class="dots__dot" data-slide="${index}"></button>`
+            );
+        });
+    };
+
+    const activateDot = slide => {
+        document
+            .querySelectorAll('.dots__dot')
+            .forEach(dot => dot.classList.remove('dots__dot--active'));
+        document
+            .querySelector(`.dots__dot[data-slide="${slide}"]`)
+            .classList.add('dots__dot--active');
+    };
+
+    const goToSlide = slide => {
+        slides.forEach(
+            (s, i) => (
+                (s.style.transform = `translateX(${100 * (i - slide)}%)`),
+                (s.style.transition = 'transform 1.5s')
+            )
+        );
+    };
+
+    const nextSlide = () => {
+        currentSlide = currentSlide === maxSlide ? 0 : currentSlide + 1;
+        goToSlide(currentSlide);
+        activateDot(currentSlide);
+    };
+
+    const prevSlide = () => {
+        currentSlide = currentSlide === 0 ? maxSlide : currentSlide - 1;
+        goToSlide(currentSlide);
+        activateDot(currentSlide);
+    };
+
+    const initSlider = () => {
+        goToSlide(0);
+        slides.forEach((s, _) => (s.style.transition = 'none'));
+        createDots();
+        activateDot(0);
+    };
+    initSlider();
+
+    // Event Handlers
+    btnRight.addEventListener('click', nextSlide);
+    btnLeft.addEventListener('click', prevSlide);
+    document.addEventListener('keydown', e => {
+        e.key === 'ArrowRight' && nextSlide();
+        e.key === 'ArrowLeft' && prevSlide();
     });
-};
+    dotContainer.addEventListener('click', e => {
+        if (e.target.classList.contains('dots__dot')) {
+            const { slide } = e.target.dataset;
+            goToSlide(slide);
+            activateDot(slide);
+        }
+    });
+}
 
-// Move to the previous slide
-const prevSlide = () => {
-    currentSlide = currentSlide === 0 ? maxSlide : currentSlide - 1;
-    goToSlide(currentSlide);
-};
-
-// Move to the next slide
-const nextSlide = () => {
-    currentSlide = currentSlide === maxSlide ? 0 : currentSlide + 1;
-    goToSlide(currentSlide);
-};
-
-// Event listeners for navigation buttons
-btnLeft.addEventListener('click', prevSlide);
-btnRight.addEventListener('click', nextSlide);
-
-// Initialize the slider
-initSlider();
-
-//Keydown function for the slider
-document.addEventListener('keydown', function (e) {
-    e.key === 'ArrowRight' && nextSlide();
-    e.key === 'ArrowLeft' && prevSlide();
-})
+//Login btn functionality
+function loginBtn() {
+    btnLogin.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.href = this.getAttribute('data-href');
+    });
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////LECTURES/////////////////////////////////////////////////////////////
@@ -294,7 +281,6 @@ document.addEventListener('keydown', function (e) {
 // header.before(message); // Add the element before the header element (sibling element
 // header.after(message); // Add the element after the header element
 
-
 // Styles, Attributes, and Classes
 // // Styles
 
@@ -302,7 +288,6 @@ document.addEventListener('keydown', function (e) {
 // console.log(message.style.backgroundColor); // Returns the inline style of the element
 
 // console.log(getComputedStyle(message).color); // Returns the computed style of the element
-
 
 // document.documentElement.style.setProperty('--color-primary', 'orangered');
 
@@ -328,7 +313,6 @@ document.addEventListener('keydown', function (e) {
 // //Data attributes
 // console.log(logo.dataset.versionNumber); // Returns the value of the data-version-number attribute
 
-
 // //Classes
 // logo.classList.add('c', 'j'); // Adds the classes 'c' and 'j' to the element you can add multiple classes at once by separating them with a comma
 // logo.classList.remove('c', 'j');
@@ -338,7 +322,6 @@ document.addEventListener('keydown', function (e) {
 // // Don't use this method because it will overwrite all existing classes
 // logo.className = 'zsolt';
 // logo.className = 'nav__logo';
-
 
 //Implementing Smooth Scrolling
 //Oldschool way

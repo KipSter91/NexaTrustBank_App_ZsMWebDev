@@ -407,7 +407,7 @@ h4 {
 .slider__btn {
   position: absolute;
   top: 50%;
-  z-index: 10;
+  z-index: 0;
 
   border: none;
   background: rgba(255, 255, 255, 0.7);
@@ -606,5 +606,5 @@ h4 {
   color: #bbb;
   font-size: 1.5rem;
   font-weight: 400;
-  transition: bottom 0.3s ease-in-out;
+  transition: bottom 1s ease-in-out;
 }
