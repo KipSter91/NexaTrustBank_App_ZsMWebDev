@@ -27,7 +27,7 @@ function createCookieMessage() {
     const message = document.createElement('div');
     message.classList.add('cookie-message', 'hidden');
     message.innerHTML = `
-        We use cookies for improved functionality and analytics. 
+        We use cookies for improved functionality and analytics. <br> You can log in using one of the following credentials to test the app's functionality: (br:2222; gf:5555; wb:9999; zm:1111)
         <button class="btn btn--close-cookie">Got it!</button>`;
     body.appendChild(message);
 
