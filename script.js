@@ -400,3 +400,22 @@ function loginBtn() {
 // [...h1.parentElement.children].forEach((e) => {
 //     if (e !== h1) e.style.transform = 'scale(0.5)'
 // });
+
+//Lifecycle DOM events
+//document ==> DOMContentLoaded
+document.addEventListener('DOMContentLoaded', e => {
+    console.log('HTML elements has been parsed and DOM tree has been created', e);
+
+});
+
+//window ==> load
+window.addEventListener('load', e => { console.log('Page fully loaded.', e) });
+
+//window ==> beforeunload (when you try to leave the page)
+// window.addEventListener('beforeunload', e => {
+//     e.preventDefault();
+//     console.log(e);
+//     e.returnValue = '';
+// });
+
+//Efficient sript loading ==> defer & async
